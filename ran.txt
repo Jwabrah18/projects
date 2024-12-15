@@ -1,0 +1,88 @@
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace GuessNumberGame
+{
+    public partial class MainForm : Form
+    {
+        private int secretNumber;   
+        private int lastGuess;      
+
+        public MainForm()
+        {
+            InitializeComponent();
+            NewGame(); 
+        }
+
+        private void NewGame()
+        {
+            Random random = new Random();
+            secretNumber = random.Next(1, 1001); 
+            lastGuess = 0; 
+            this.BackColor = SystemColors.Control; // Reset the form background color
+            lblMessage.Text = "I have a number between 1 and 1000. Can you guess my number?";
+            txtGuess.Enabled = true; 
+            btnNewGame.Enabled = false; // Disable the "New Game" button
+            txtGuess.Clear(); 
+        }
+
+        private void txtGuess_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) 
+            {
+                int guess;
+
+                if (!int.TryParse(txtGuess.Text, out guess) || guess < 1 || guess > 1000)
+                {
+                    MessageBox.Show("Please enter a number between 1 and 1000.");
+                    txtGuess.Clear();
+                    return;
+                }
+
+                CheckGuess(guess); 
+            }
+        }
+
+        private void CheckGuess(int guess)
+        {
+            
+            if (guess == secretNumber)
+            {
+                lblMessage.Text = "Correct!";
+                txtGuess.Enabled = false; // Disable input
+                btnNewGame.Enabled = true; // Enable the "New Game" button
+                this.BackColor = Color.LightGreen; // Change background to green
+                MessageBox.Show("Congratulations! You guessed the correct number!");
+            }
+            else
+            {
+               
+                if (guess > secretNumber)
+                    lblMessage.Text = "Too High!";
+                else
+                    lblMessage.Text = "Too Low!";
+
+              
+                if (lastGuess != 0)
+                {
+                    int prevDiff = Math.Abs(lastGuess - secretNumber);
+                    int currDiff = Math.Abs(guess - secretNumber);
+
+                    if (currDiff < prevDiff)
+                        this.BackColor = Color.LightCoral; 
+                    else
+                        this.BackColor = Color.LightBlue;  
+                }
+
+                lastGuess = guess; 
+                txtGuess.Clear(); 
+            }
+        }
+
+        private void btnNewGame_Click(object sender, EventArgs e)
+        {
+            NewGame(); 
+        }
+    }
+}
